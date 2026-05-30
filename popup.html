@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>AutoMFA - 2FA Auto-filler</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a, #1e1b4b);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent: #f59e0b;
+      /* Amber gold */
+      --accent-hover: #d97706;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 350px;
+      min-height: 490px;
+      background: var(--bg-gradient);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 16px;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Glassmorphism Panel */
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 450px;
+      transition: all 0.3s ease;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Headers */
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(to right, #f59e0b, #facc15);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 img {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+      -webkit-text-fill-color: initial;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    p {
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Disclaimer Styling */
+    .disclaimer-box {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--danger);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .disclaimer-box p {
+      color: #fca5a5;
+      font-size: 0.78rem;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .disclaimer-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Steps Onboarding Instructions list */
+    .instruction-steps {
+      list-style-type: none;
+      margin: 8px 0;
+    }
+
+    .instruction-steps li {
+      font-size: 0.8rem;
+      line-height: 1.35;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .instruction-steps li::before {
+      content: "✓";
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .highlight-link {
+      color: var(--accent);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    /* Buttons Group */
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15);
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      box-shadow: none;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: white;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      transition: border-color 0.2s;
+      outline: none;
+      font-family: monospace;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    /* Visual indicators */
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .indicator-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: background 0.3s;
+    }
+
+    .indicator-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .tutorial-graphic {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin: 8px 0;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .graphic-highlight {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* TOTP Main Code View */
+    .totp-container {
+      text-align: center;
+      margin: 15px 0;
+      position: relative;
+    }
+
+    .code-display {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border-color);
+      display: inline-block;
+      min-width: 170px;
+      transition: all 0.2s;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .code-display:hover {
+      background: rgba(15, 23, 42, 0.7);
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    .copy-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Circular Timer Progress */
+    .timer-bar-container {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #facc15);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .timer-bar.danger {
+      background: linear-gradient(90deg, var(--danger), #fca5a5);
+    }
+
+    /* Footer info */
+    .footer-note {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .toast {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--success);
+      color: #0f172a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- VIEW 1: SECURITY DISCLAIMER -->
+  <div id="disclaimer-view" class="panel">
+    <div>
+      <h1>⚠️ Security Disclaimer</h1>
+      <p style="margin-top: 6px;">Please accept this disclaimer to enable the AutoMFA extension.</p>
+
+      <div class="disclaimer-box">
+        <p><strong>Bypassing MFA is a security risk.</strong> Multifactor Authentication (MFA) protects your account
+          against password theft. Automating or localizing these credentials lowers that barrier.</p>
+        <p><strong>User Responsibility:</strong> You take full, exclusive responsibility for all security risks, data
+          loss, policy violations, or credential issues arising from your use of this extension.</p>
+        <p>No keys are sent online. All secrets are stored exclusively on your device inside standard local storage.</p>
+      </div>
+    </div>
+
+    <div>
+      <button id="accept-disclaimer-btn" class="btn">I Accept the Risk & Continue</button>
+    </div>
+  </div>
+
+  <!-- VIEW 2: GET SECRET STEP (INSTRUCTIONS) -->
+  <div id="step-1-view" class="panel hidden">
+    <div>
+      <div class="step-indicator">
+        <div class="indicator-dot active"></div>
+        <div class="indicator-dot"></div>
+        <div class="indicator-dot"></div>
+      </div>
+      <h2>🔑 Step 1: Get Secret Key</h2>
+      <p>Log in and retrieve your key from Microsoft Security Setup:</p>
+
+      <ul class="instruction-steps">
+        <li>Go to <a href="https://mysignins.microsoft.com/security-info" target="_blank"
+            class="highlight-link">mysignins.microsoft.com/security-info</a> and log in with your organization (e.g.
+          Purdue) email.</li>
+        <li>Click <strong>Add sign-in method</strong> and select <strong>Microsoft Authenticator</strong>.</li>
+        <li>On the prompt, click the link that says <strong>"Set Up A Different Authentication App"</strong> (or <em>"I
+            want to use a different authenticator app"</em>).</li>
+        <li>Press Next until you see the QR Code, then click <strong>"Can't scan the QR code"</strong>.</li>
+        <li>Copy the revealed <strong>Secret Key</strong> (a string of lowercase letters and numbers).</li>
+      </ul>
+    </div>
+
+    <div class="button-group">
+      <button id="step1-back-btn" class="btn btn-secondary">⬅️ Back</button>
+      <button id="step1-next-btn" class="btn">Next: Paste Key ➡️</button>
+    </div>
+  </div>
+
+  <!-- VIEW 3: SETUP SECRET STEP (INPUT) -->
+  <div id="step-2-view" class="panel hidden">
+    <div>
+      <div class="step-indicator">
+        <div class="indicator-dot"></div>
+        <div class="indicator-dot active"></div>
+        <div class="indicator-dot"></div>
+      </div>
+      <h1><img src="icon32.png" alt="Logo"> AutoMFA Config</h1>
+      <p style="margin-top: 4px;">Paste the secret key you just retrieved from the Microsoft setup screen.</p>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <label for="secret">Base32 Secret Key</label>
+        <input type="text" id="secret" placeholder="Enter secret (lowercase letters & numbers)" autocomplete="off"
+          spellcheck="false">
+        <p id="setup-error" style="color: var(--danger); font-size: 0.74rem; margin-top: 4px; display: none;">⚠️ Invalid
+          base32 secret. It must consist only of letters and numbers 2-7.</p>
+      </div>
+
+      <div class="tutorial-graphic" style="font-size: 0.74rem;">
+        💡 Secrets are case-insensitive and ignores spaces. Standard format uses letters and numbers 2-7.
+      </div>
+
+      <div class="tutorial-graphic"
+        style="font-size: 0.74rem; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05); margin-top: 8px;">
+        ⚠️ <strong class="graphic-highlight">Important:</strong> Once setup is complete, you must copy the 6-digit
+        verification code generated by this extension and paste it back into the Microsoft sign-ins page to confirm and
+        finish adding your new device!
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button id="step2-back-btn" class="btn btn-secondary">⬅️ Back</button>
+      <button id="step2-next-btn" class="btn">Save & Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- VIEW 4: AUTOMATED LOGIN INFO STEP -->
+  <div id="step-3-view" class="panel hidden">
+    <div>
+      <div class="step-indicator">
+        <div class="indicator-dot"></div>
+        <div class="indicator-dot"></div>
+        <div class="indicator-dot active"></div>
+      </div>
+      <h2>⚡ Step 3: Auto-Login Magic</h2>
+      <p>Your secret is saved! Here is how to use the automation features:</p>
+
+      <div class="tutorial-graphic" style="margin-bottom: 10px;">
+        <span class="graphic-highlight">💻 Fully Automated Login:</span><br>
+        When you log in, the extension automatically clicks through Microsoft's Authenticator screens:
+        <br>1. Clicks <em>"I can't use my Authenticator app right now"</em>
+        <br>2. Clicks <em>"Use a verification code"</em>
+        <br>3. Generates, pastes, and submits the code instantly!
+      </div>
+
+      <div class="tutorial-graphic">
+        <span class="graphic-highlight">🖱️ Right-Click Paste Options:</span><br>
+        Right-click on any input box or login page to see options:<br>
+        - <strong>AutoMFA: Autofill Microsoft Login</strong> (forces auto-bypass)<br>
+        - <strong>AutoMFA: Paste into selected textbox</strong> (pastes code instantly)
+      </div>
+    </div>
+
+    <div
+      style="display: flex; align-items: center; gap: 8px; margin: 10px 0 0 0; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <input type="checkbox" id="toggle-auto-bypass-setup" checked
+        style="width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer;">
+      <label for="toggle-auto-bypass-setup"
+        style="margin: 0; cursor: pointer; text-transform: none; font-size: 0.76rem; font-weight: normal; color: var(--text);">Enable
+        Zero-Click Auto-Login</label>
+    </div>
+
+    <div class="button-group">
+      <button id="step3-back-btn" class="btn btn-secondary">⬅️ Back</button>
+      <button id="step3-finish-btn" class="btn">Finish & Activate 🎉</button>
+    </div>
+  </div>
+
+  <!-- VIEW 5: MAIN VIEW (TOTP GENERATOR) -->
+  <div id="main-view" class="panel hidden">
+    <div>
+      <h1><img src="icon32.png" alt="Logo"> AutoMFA Active</h1>
+      <p style="margin-top: 4px;">Your 2FA generator is active. Use the context menu or copy below.</p>
+
+      <div class="totp-container">
+        <div id="code" class="code-display">------</div>
+        <div class="copy-hint">🖱️ Click code to copy to clipboard</div>
+      </div>
+
+      <div class="timer-bar-container">
+        <div id="timer-bar" class="timer-bar"></div>
+      </div>
+      <p id="timer-text" style="font-size: 0.72rem; text-align: center; color: var(--text-muted); margin-bottom: 0;">
+        Code updates in 30 seconds</p>
+
+      <div style="display: flex; align-items: center; gap: 8px; margin: 12px auto 0 auto; background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); justify-content: space-between; max-width: 260px;">
+        <span style="font-size: 0.74rem; color: var(--text-muted);">Zero-Click Auto-Login</span>
+        <input type="checkbox" id="toggle-auto-bypass-active" checked style="width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer;">
+      </div>
+    </div>
+
+    <div>
+      <button id="reset-btn" class="btn btn-danger">🗑️ Reset Secret Key</button>
+      <p class="footer-note">AutoMFA v1.4 | Protected by local storage<br>🔒 Your secret key stays entirely within this browser storage and is not backed up anywhere.</p>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">📋 Copied to Clipboard!</div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
