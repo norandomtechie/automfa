@@ -13,6 +13,10 @@
 
 Instead of opening an authenticator app on your phone every time you log in, AutoMFA securely generates your verification codes offline inside your browser. It includes a smart background automation script that instantly detects Microsoft authentication prompts, chooses the verification code method, and autofills the code on your behalf in a matter of seconds.
 
+![automfa-inst.png](automfa-inst.png)
+
+![automfa-code.png](automfa-code.png)
+
 ---
 
 ## Installation
