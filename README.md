@@ -30,6 +30,9 @@ Instead of opening an authenticator app on your phone every time you log in, Aut
 6. The **AutoMFA** extension is now active! Click the puzzle icon in your toolbar to pin it for easy access if needed.
 
 ### Mozilla Firefox
+
+The XPI file signed by Mozilla is available for download [here](./automfa.xpi).  You can also try it out in developer mode as shown:
+
 1. Download or clone this repository to a folder on your computer.
 2. Open Mozilla Firefox and navigate to `about:debugging#/runtime/this-firefox`.
 3. Click the **Load Temporary Add-on...** button.

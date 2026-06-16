@@ -29,5 +29,14 @@
     }
   ],
   "permissions": ["storage", "contextMenus", "notifications"],
-  "host_permissions": ["<all_urls>"]
+  "host_permissions": ["<all_urls>"],
+  "browser_specific_settings": 
+    { 
+      "gecko": { 
+        "id": "nirajmmenon@gmail.com",
+        "data_collection_permissions": {
+          "required": ["none"]
+        }
+      }
+    }
 }
