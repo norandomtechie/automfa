@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AutoMFA - Secure 2FA Auto-filler",
-  "version": "1.4",
+  "version": "1.7",
   "description": "Securely generates and auto-fills 2FA TOTP codes for seamless Microsoft logins.",
   "icons": {
     "16": "icon16.png",
@@ -20,23 +20,36 @@
   },
   "background": {
     "service_worker": "background.js",
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
   "content_scripts": [
     {
-      "matches": ["https://mysignins.microsoft.com/*"],
-      "js": ["content.js"]
+      "matches": [
+        "https://mysignins.microsoft.com/*"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ],
-  "permissions": ["storage", "contextMenus", "notifications"],
-  "host_permissions": ["https://mysignins.microsoft.com/*"],
-  "browser_specific_settings": 
-    { 
-      "gecko": { 
-        "id": "nirajmmenon@gmail.com",
-        "data_collection_permissions": {
-          "required": ["none"]
-        }
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://mysignins.microsoft.com/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "nirajmmenon@gmail.com",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
       }
     }
+  }
 }
