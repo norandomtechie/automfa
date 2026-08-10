@@ -65,15 +65,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 // Create menu on install
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({ 
-        id: "automfa-paste", 
-        title: "AutoMFA: Autofill Microsoft Login", 
-        contexts: ["all"] 
+    chrome.contextMenus.create({
+        id: "automfa-paste",
+        title: "AutoMFA: Autofill Microsoft Login",
+        contexts: ["all"],
+        documentUrlPatterns: ["https://mysignins.microsoft.com/*"]
     });
-    chrome.contextMenus.create({ 
-        id: "automfa-paste-textbox", 
-        title: "AutoMFA: Paste into selected textbox", 
-        contexts: ["editable"] 
+    chrome.contextMenus.create({
+        id: "automfa-paste-textbox",
+        title: "AutoMFA: Paste into selected textbox",
+        contexts: ["editable"],
+        documentUrlPatterns: ["https://mysignins.microsoft.com/*"]
     });
 });
 
