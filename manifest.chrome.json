@@ -27,7 +27,7 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["storage", "contextMenus", "notifications"],
+  "permissions": ["storage", "contextMenus"],
   "host_permissions": ["https://mysignins.microsoft.com/*"],
   "browser_specific_settings": 
     { 
