@@ -1,3 +1,4 @@
 .env
 web-ext-artifacts/
 .amo-upload-uuid
+scripts/
