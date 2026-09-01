@@ -23,12 +23,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://mysignins.microsoft.com/*"],
+      "matches": ["https://mysignins.microsoft.com/*", "https://login.microsoftonline.com/*"],
       "js": ["content.js"]
     }
   ],
   "permissions": ["storage", "contextMenus"],
-  "host_permissions": ["https://mysignins.microsoft.com/*"],
+  "host_permissions": ["https://mysignins.microsoft.com/*", "https://login.microsoftonline.com/*"],
   "browser_specific_settings": 
     { 
       "gecko": { 
