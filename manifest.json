@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AutoMFA - Secure 2FA Auto-filler",
-  "version": "1.8",
+  "version": "1.9",
   "description": "Securely generates and auto-fills 2FA TOTP codes for seamless Microsoft logins.",
   "icons": {
     "16": "icon16.png",
@@ -27,7 +27,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://mysignins.microsoft.com/*", 
+        "https://mysignins.microsoft.com/*",
         "https://login.microsoftonline.com/*"
       ],
       "js": [
